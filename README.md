@@ -49,3 +49,7 @@ Changelog
 ---------
 
 * 1.0 - First release.
+
+Credit
+------
+Based on : https://github.com/JanBednarik/micropython-ws2812
