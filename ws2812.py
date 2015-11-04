@@ -27,7 +27,7 @@ class WS2812:
     Version: 1.0
     """
     # Values to put inside SPi register for each color's bit
-    buf_bytes = (0xE0, 0xFC)
+    buf_bytes = (0xE0E0, 0xFCE0, 0xE0FC, 0xFCFC)
 
     def __init__(self, ledNumber=1, brightness=100):
         """
@@ -88,39 +88,26 @@ class WS2812:
         buf_bytes = self.buf_bytes
         brightness = self.brightness
 
-        mask = 0x01
         index = start * 24
         for red, green, blue in data:
             red = int(red * brightness // 100)
             green = int(green * brightness // 100)
             blue = int(blue * brightness // 100)
 
-            buf[index] = buf_bytes[green >> 7 & mask]
-            buf[index+1] = buf_bytes[green >> 6 & mask]
-            buf[index+2] = buf_bytes[green >> 5 & mask]
-            buf[index+3] = buf_bytes[green >> 4 & mask]
-            buf[index+4] = buf_bytes[green >> 3 & mask]
-            buf[index+5] = buf_bytes[green >> 2 & mask]
-            buf[index+6] = buf_bytes[green >> 1 & mask]
-            buf[index+7] = buf_bytes[green & mask]
+            buf[index] = buf_bytes[green >> 6 & 0x03]
+            buf[index+2] = buf_bytes[green >> 4 & 0x03]
+            buf[index+4] = buf_bytes[green >> 2 & 0x03]
+            buf[index+6] = buf_bytes[green & 0x03]
 
-            buf[index+8] = buf_bytes[red >> 7 & mask]
-            buf[index+9] = buf_bytes[red >> 6 & mask]
-            buf[index+10] = buf_bytes[red >> 5 & mask]
-            buf[index+11] = buf_bytes[red >> 4 & mask]
-            buf[index+12] = buf_bytes[red >> 3 & mask]
-            buf[index+13] = buf_bytes[red >> 2 & mask]
-            buf[index+14] = buf_bytes[red >> 1 & mask]
-            buf[index+15] = buf_bytes[red & mask]
+            buf[index+8] = buf_bytes[red >> 6 & 0x03]
+            buf[index+10] = buf_bytes[red >> 4 & 0x03]
+            buf[index+12] = buf_bytes[red >> 2 & 0x03]
+            buf[index+14] = buf_bytes[red & mask]
 
-            buf[index+16] = buf_bytes[blue >> 7 & mask]
-            buf[index+17] = buf_bytes[blue >> 6 & mask]
-            buf[index+18] = buf_bytes[blue >> 5 & mask]
-            buf[index+19] = buf_bytes[blue >> 4 & mask]
-            buf[index+20] = buf_bytes[blue >> 3 & mask]
-            buf[index+21] = buf_bytes[blue >> 2 & mask]
-            buf[index+22] = buf_bytes[blue >> 1 & mask]
-            buf[index+23] = buf_bytes[blue  & mask]
+            buf[index+16] = buf_bytes[blue >> 6 & 0x03]
+            buf[index+18] = buf_bytes[blue >> 4 & 0x03]
+            buf[index+20] = buf_bytes[blue >> 2 & 0x03]
+            buf[index+22] = buf_bytes[blue & 0x03]
 
             index += 24
 
@@ -139,7 +126,7 @@ class WS2812:
         off = self.buf_bytes[0]
         for index in range(end * 24, self.buf_length):
             buf[index] = off
-            index += 1
+            index += 2
             
     def set_brightness(self, brightness):
         """
