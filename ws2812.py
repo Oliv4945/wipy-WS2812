@@ -102,7 +102,7 @@ class WS2812:
             buf[index+8] = buf_bytes[red >> 6 & 0x03]
             buf[index+10] = buf_bytes[red >> 4 & 0x03]
             buf[index+12] = buf_bytes[red >> 2 & 0x03]
-            buf[index+14] = buf_bytes[red & mask]
+            buf[index+14] = buf_bytes[red & 0x03]
 
             buf[index+16] = buf_bytes[blue >> 6 & 0x03]
             buf[index+18] = buf_bytes[blue >> 4 & 0x03]
