@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # Based on https://github.com/JanBednarik/micropython-ws2812
+# Adapted for LoPy by @aureleq
 
 import gc
 from machine import SPI
 from machine import Pin
 from machine import disable_irq
 from machine import enable_irq
-
+from uos import uname
 
 class WS2812:
     """
@@ -29,11 +30,12 @@ class WS2812:
     # Values to put inside SPi register for each color's bit
     buf_bytes = (0xE0E0, 0xFCE0, 0xE0FC, 0xFCFC)
 
-    def __init__(self, ledNumber=1, brightness=100):
+    def __init__(self, ledNumber=1, brightness=100, dataPin='P22'):
         """
         Params:
         * ledNumber = count of LEDs
         * brightness = light brightness (integer : 0 to 100%)
+        * dataPin = pin to connect data channel (LoPy only)
         """
         self.ledNumber = ledNumber
         self.brightness = brightness
@@ -45,9 +47,14 @@ class WS2812:
         # SPI init
         # Bus 0, 8MHz => 125 ns by bit, 8 clock cycle when bit transfert+2 clock cycle between each transfert
         # => 125*10=1.25 us required by WS2812
-        self.spi = SPI(0, SPI.MASTER, baudrate=8000000, polarity=0, phase=1)
-        # Enable pull down
-        Pin('GP16', mode=Pin.ALT, pull=Pin.PULL_DOWN)
+        if uname().sysname == 'LoPy':
+            self.spi = SPI(0, SPI.MASTER, baudrate=8000000, polarity=0, phase=1, pins=(None, dataPin, None))
+             # Enable pull down
+	    Pin(dataPin, mode=Pin.OUT, pull=Pin.PULL_DOWN)
+	else: #WiPy
+            self.spi = SPI(0, SPI.MASTER, baudrate=8000000, polarity=0, phase=1)
+            # Enable pull down
+            Pin('GP16', mode=Pin.ALT, pull=Pin.PULL_DOWN)
         
         # Turn LEDs off
         self.show([])
